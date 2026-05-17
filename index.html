@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Dashboard</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Boxicons CSS -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar close">
+        <header>
+            <div class="image-text">
+                <span class="image">
+                    <!-- Brand Icon -->
+                    <i class='bx bx-cube-alt logo-icon'></i>
+                </span>
+                <div class="text logo-text">
+                    <span class="name">APID-8-01</span>
+                    <span class="profession">Dashboard</span>
+                </div>
+            </div>
+            <i class='bx bx-chevron-right toggle'></i>
+        </header>
+
+        <div class="menu-bar">
+            <div class="menu">
+                <li class="search-box">
+                    <i class='bx bx-search icon'></i>
+                    <input type="text" placeholder="Search...">
+                </li>
+
+                <ul class="menu-links">
+                    <li class="nav-link active">
+                        <a href="dashboard_report.html" target="content-frame">
+                            <i class='bx bx-home-alt icon'></i>
+                            <span class="text nav-text">Daily Shift</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="revenue_report.html" target="content-frame">
+                            <i class='bx bx-bar-chart-alt-2 icon'></i>
+                            <span class="text nav-text">Revenue</span>
+                        </a>
+                    </li>
+                    <li class="nav-link">
+                        <a href="notifications_report.html" target="content-frame">
+                            <i class='bx bx-line-chart icon'></i>
+                            <span class="text nav-text">EDA3.0 PPT</span>
+                        </a>
+                    </li>
+                    <li class="nav-link sub-menu-wrap">
+                        <a href="#" class="submenu-toggle">
+                            <i class='bx bx-link icon'></i>
+                            <span class="text nav-text">common use</span>
+                            <i class='bx bx-chevron-down arrow text'></i>
+                        </a>
+                        <ul class="sub-menu">
+                            <li><a href="analytics_report.html" target="content-frame">Overview</a></li>
+                            <li><a href="#" target="content-frame">Detailed Stats</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-link">
+                        <a href="likes_report.html" target="content-frame">
+                            <i class='bx bx-heart icon'></i>
+                            <span class="text nav-text">OTHERS</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bottom-content">
+                <li class="mode">
+                    <div class="sun-moon">
+                        <i class='bx bx-moon icon moon'></i>
+                        <i class='bx bx-sun icon sun'></i>
+                    </div>
+                    <span class="mode-text text">Dark mode</span>
+                    <div class="toggle-switch">
+                        <span class="switch"></span>
+                    </div>
+                </li>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <section class="home">
+        <iframe name="content-frame" src="dashboard_report.html" frameborder="0" class="content-iframe"></iframe>
+    </section>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
