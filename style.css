@@ -163,6 +163,11 @@ body.dark .sidebar .toggle {
     margin-top: 40px;
 }
 
+.sidebar .menu-links {
+    padding-left: 0;
+    margin-bottom: 0;
+}
+
 .sidebar li.search-box {
     height: 50px;
     border-radius: 8px;
