@@ -1,6 +1,7 @@
 const body = document.querySelector('body'),
       sidebar = body.querySelector('nav'),
       toggle = body.querySelector(".toggle"),
+      homeLink = body.querySelector(".home-link"),
       searchBtn = body.querySelector(".search-box"),
       modeSwitch = body.querySelector(".toggle-switch"),
       modeText = body.querySelector(".mode-text"),
@@ -96,4 +97,9 @@ submenuLinks.forEach(link => {
         this.classList.add("active");
         this.closest(".nav-link").classList.add("active");
     });
+});
+
+homeLink.addEventListener("click", () => {
+    navLinks.forEach(navLink => navLink.classList.remove("active"));
+    submenuLinks.forEach(submenuLink => submenuLink.classList.remove("active"));
 });

@@ -106,6 +106,18 @@ body.dark .sidebar {
     width: 100%;
 }
 
+.sidebar header .home-link {
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 6px 0;
+    text-decoration: none;
+    transition: var(--tran-03);
+}
+
+.sidebar header .home-link:hover {
+    background-color: var(--primary-color-light);
+}
+
 .sidebar.close header .image-text {
     width: auto;
 }
