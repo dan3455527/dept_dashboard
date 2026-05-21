@@ -4,16 +4,48 @@ const body = document.querySelector('body'),
       searchBtn = body.querySelector(".search-box"),
       modeSwitch = body.querySelector(".toggle-switch"),
       modeText = body.querySelector(".mode-text"),
-      navLinks = body.querySelectorAll(".nav-link");
+      navLinks = body.querySelectorAll(".nav-link"),
+      submenuLinks = body.querySelectorAll(".sub-menu a"),
+      submenuWraps = body.querySelectorAll(".sub-menu-wrap");
+
+let openSubmenus = Array.from(submenuWraps)
+    .filter(menu => menu.classList.contains("showMenu") || menu.dataset.defaultOpen === "true");
+
+function rememberOpenSubmenus() {
+    openSubmenus = Array.from(submenuWraps).filter(menu => menu.classList.contains("showMenu"));
+}
+
+function collapseSubmenus() {
+    submenuWraps.forEach(menu => menu.classList.remove("showMenu"));
+}
+
+function restoreOpenSubmenus() {
+    collapseSubmenus();
+    openSubmenus.forEach(menu => menu.classList.add("showMenu"));
+}
+
+if (sidebar.classList.contains("close")) {
+    collapseSubmenus();
+} else {
+    restoreOpenSubmenus();
+}
 
 // Toggle Sidebar
 toggle.addEventListener("click", () => {
-    sidebar.classList.toggle("close");
+    if (sidebar.classList.contains("close")) {
+        sidebar.classList.remove("close");
+        restoreOpenSubmenus();
+    } else {
+        rememberOpenSubmenus();
+        collapseSubmenus();
+        sidebar.classList.add("close");
+    }
 });
 
 // Open sidebar when search box is clicked
 searchBtn.addEventListener("click", () => {
     sidebar.classList.remove("close");
+    restoreOpenSubmenus();
 });
 
 // Check local storage for dark mode preference
@@ -35,28 +67,33 @@ modeSwitch.addEventListener("click", () => {
     }
 });
 
-// Update active state on nav links
-navLinks.forEach(link => {
-    link.addEventListener("click", function() {
-        // Remove active class from all links
-        navLinks.forEach(l => l.classList.remove("active"));
-        // Add active class to clicked link
-        this.classList.add("active");
+// Toggle sub-menus
+const submenuToggles = body.querySelectorAll(".submenu-toggle");
+submenuToggles.forEach(submenuToggle => {
+    submenuToggle.addEventListener("click", function(e) {
+        e.preventDefault();
+
+        if (sidebar.classList.contains("close")) {
+            sidebar.classList.remove("close");
+            restoreOpenSubmenus();
+            return;
+        }
+
+        this.parentElement.classList.toggle("showMenu");
+        rememberOpenSubmenus();
     });
 });
 
-// Toggle sub-menus
-const submenuToggles = body.querySelectorAll(".submenu-toggle");
-submenuToggles.forEach(toggle => {
-    toggle.addEventListener("click", function(e) {
-        e.preventDefault(); // Prevent default link behavior
-        
-        // Auto-expand sidebar if closed
-        if (sidebar.classList.contains("close")) {
-            sidebar.classList.remove("close");
+submenuLinks.forEach(link => {
+    link.addEventListener("click", function(e) {
+        if (this.getAttribute("href") === "#") {
+            e.preventDefault();
         }
-        
-        // Toggle the sub-menu
-        this.parentElement.classList.toggle("showMenu");
+
+        navLinks.forEach(navLink => navLink.classList.remove("active"));
+        submenuLinks.forEach(submenuLink => submenuLink.classList.remove("active"));
+
+        this.classList.add("active");
+        this.closest(".nav-link").classList.add("active");
     });
 });

@@ -383,6 +383,10 @@ body.dark .switch::before {
     display: block;
 }
 
+.sidebar.close .sub-menu {
+    display: none;
+}
+
 .sidebar .sub-menu li {
     height: auto;
     margin-top: 0;
@@ -402,6 +406,11 @@ body.dark .switch::before {
     background-color: transparent;
 }
 
+.sidebar .sub-menu li a.active {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
 .sidebar li .arrow {
     transition: var(--tran-03);
     margin-left: auto;
@@ -409,6 +418,10 @@ body.dark .switch::before {
 
 .sidebar li.showMenu > a .arrow {
     transform: rotate(180deg);
+}
+
+.sidebar.close li.showMenu > a .arrow {
+    transform: none;
 }
 
 /* Home / Main Content Section */
