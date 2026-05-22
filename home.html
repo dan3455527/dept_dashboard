@@ -75,11 +75,23 @@
             text-align: center;
         }
 
-        .announce-stack {
+        .announce-layout,
+        .announce-stack,
+        .announce-carousel {
             width: min(100%, 1240px);
             margin: 0 auto;
+        }
+
+        .announce-layout,
+        .announce-stack {
             display: grid;
             gap: 22px;
+        }
+
+        .announce-stack,
+        .announce-carousel {
+            width: 100%;
+            margin: 0;
         }
 
         .announce-frame {
@@ -112,6 +124,59 @@
                 linear-gradient(135deg, #f9f9f9, #fbfdff);
             font-size: 34px;
             font-weight: 700;
+        }
+
+        .announce-carousel {
+            position: relative;
+            aspect-ratio: 16 / 9;
+        }
+
+        .announce-carousel .announce-frame {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.45s ease;
+        }
+
+        .announce-carousel .announce-frame.active-slide {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .announce-carousel .announce-frame img,
+        .announce-carousel .announce-placeholder {
+            height: 100%;
+        }
+
+        .carousel-arrow {
+            position: absolute;
+            top: 50%;
+            z-index: 5;
+            width: 46px;
+            height: 64px;
+            border: 0;
+            border-radius: 10px;
+            background: rgba(28, 28, 28, 0.24);
+            color: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            font-size: 34px;
+            line-height: 1;
+            transform: translateY(-50%);
+            transition: all 0.2s ease;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(28, 28, 28, 0.42);
+            color: #ffffff;
+        }
+
+        .carousel-prev {
+            left: 16px;
+        }
+
+        .carousel-next {
+            right: 16px;
         }
 
         .download-row {
@@ -174,6 +239,12 @@
                 align-items: flex-start;
                 flex-direction: column;
             }
+
+            .carousel-arrow {
+                width: 38px;
+                height: 54px;
+                font-size: 28px;
+            }
         }
     </style>
 </head>
@@ -193,21 +264,27 @@
             </div>
         </header>
 
-        <section class="announce-stack" id="announceStack" aria-label="Announcement images"></section>
+        <section class="announce-layout" id="announcementOutput" aria-label="Announcement images"></section>
+
+        <template id="announcementTemplate">
+            <stack>
+                <carousel>
+                    <slide src="./Announce_img/test_img1.png"></slide>
+                    <slide src="./Announce_img/test_img2.png"></slide>
+                </carousel>
+                <slide src="./Announce_img/test_img1.png"></slide>
+            </stack>
+        </template>
 
         <section class="download-row">
             <div class="download-label">Download : <span id="downloadName">new_tool.xlsm</span></div>
-            <a class="download-link" id="downloadLink" href="Tools/new_tool.xlsm" download>Download file</a>
+            <a class="download-link" id="downloadLink" href="Tools/ne_tool.xlsm" download>Download file</a>
         </section>
     </main>
 
     <script>
-        const announcementImages = [
-            "./Announce_img/test_img.png",
-            "./Announce_img/test_img.png"
-        ];
-
-        const downloadFile = "Tools/new_tool.xlsm";
+        const rotateIntervalMs = 5000;
+        const carouselStates = [];
 
         function getWeekNo(date) {
             const startOfYear = new Date(date.getFullYear(), 0, 1);
@@ -240,47 +317,175 @@
             return frame;
         }
 
-        function renderAnnouncementImages() {
-            const stack = document.getElementById("announceStack");
-            let loadedCount = 0;
+        function createImageFrame(src) {
+            const frame = document.createElement("article");
+            const img = document.createElement("img");
 
-            announcementImages.forEach(src => {
-                const frame = document.createElement("article");
-                const img = document.createElement("img");
+            frame.className = "announce-frame";
+            img.src = src;
+            img.alt = "Announcement slide";
+            img.onerror = () => {
+                frame.replaceWith(createPlaceholder());
+            };
+            frame.appendChild(img);
 
-                frame.className = "announce-frame";
-                img.src = src;
-                img.alt = "Announcement slide";
-                img.onload = () => {
-                    loadedCount += 1;
-                };
-                img.onerror = () => {
-                    frame.remove();
-                    if (loadedCount === 0 && stack.children.length === 0) {
-                        stack.appendChild(createPlaceholder());
+            return frame;
+        }
+
+        function readTextSources(text) {
+            return text
+                .split(/[\n,]+/)
+                .map(source => source.trim())
+                .filter(Boolean);
+        }
+
+        function readSlideSource(node) {
+            return node.getAttribute("src") || node.getAttribute("href") || node.textContent.trim();
+        }
+
+        function appendLayoutChildren(sourceParent, targetParent) {
+            Array.from(sourceParent.childNodes).forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    readTextSources(node.textContent).forEach(src => {
+                        targetParent.appendChild(createImageFrame(src));
+                    });
+                    return;
+                }
+
+                if (node.nodeType !== Node.ELEMENT_NODE) {
+                    return;
+                }
+
+                const tagName = node.tagName.toLowerCase();
+
+                if (tagName === "stack") {
+                    targetParent.appendChild(renderStack(node));
+                    return;
+                }
+
+                if (tagName === "carousel") {
+                    targetParent.appendChild(renderCarousel(node));
+                    return;
+                }
+
+                if (["slide", "image", "announcement-image"].includes(tagName)) {
+                    const src = readSlideSource(node);
+
+                    if (src) {
+                        targetParent.appendChild(createImageFrame(src));
                     }
-                };
-
-                frame.appendChild(img);
-                stack.appendChild(frame);
+                }
             });
+        }
 
-            if (announcementImages.length === 0) {
+        function renderStack(sourceStack) {
+            const stack = document.createElement("section");
+
+            stack.className = "announce-stack";
+            appendLayoutChildren(sourceStack, stack);
+
+            if (stack.children.length === 0) {
                 stack.appendChild(createPlaceholder());
+            }
+
+            return stack;
+        }
+
+        function renderCarousel(sourceCarousel) {
+            const carousel = document.createElement("section");
+            const prevArrow = document.createElement("button");
+            const nextArrow = document.createElement("button");
+            const state = {
+                currentSlide: 0,
+                timer: null,
+                slides: []
+            };
+
+            carousel.className = "announce-carousel";
+            prevArrow.className = "carousel-arrow carousel-prev";
+            prevArrow.type = "button";
+            prevArrow.setAttribute("aria-label", "Previous announcement");
+            prevArrow.textContent = "<";
+            nextArrow.className = "carousel-arrow carousel-next";
+            nextArrow.type = "button";
+            nextArrow.setAttribute("aria-label", "Next announcement");
+            nextArrow.textContent = ">";
+
+            appendLayoutChildren(sourceCarousel, carousel);
+            state.slides = Array.from(carousel.querySelectorAll(":scope > .announce-frame"));
+
+            if (state.slides.length === 0) {
+                carousel.appendChild(createPlaceholder());
+                state.slides = Array.from(carousel.querySelectorAll(":scope > .announce-frame"));
+            }
+
+            carousel.appendChild(prevArrow);
+            carousel.appendChild(nextArrow);
+            carouselStates.push(state);
+
+            function showSlide(index, restartTimer) {
+                if (state.slides.length === 0) {
+                    return;
+                }
+
+                state.currentSlide = (index + state.slides.length) % state.slides.length;
+                state.slides.forEach((slide, slideIndex) => {
+                    slide.classList.toggle("active-slide", slideIndex === state.currentSlide);
+                });
+
+                if (restartTimer) {
+                    startCarouselTimer(state);
+                }
+            }
+
+            prevArrow.addEventListener("click", () => showSlide(state.currentSlide - 1, true));
+            nextArrow.addEventListener("click", () => showSlide(state.currentSlide + 1, true));
+            showSlide(0, false);
+            startCarouselTimer(state);
+
+            return carousel;
+        }
+
+        function startCarouselTimer(state) {
+            clearInterval(state.timer);
+
+            if (state.slides.length > 1) {
+                state.timer = setInterval(() => {
+                    state.currentSlide = (state.currentSlide + 1) % state.slides.length;
+                    state.slides.forEach((slide, slideIndex) => {
+                        slide.classList.toggle("active-slide", slideIndex === state.currentSlide);
+                    });
+                }, rotateIntervalMs);
+            }
+        }
+
+        function renderAnnouncementTemplate() {
+            const output = document.getElementById("announcementOutput");
+            const template = document.getElementById("announcementTemplate");
+
+            carouselStates.forEach(state => clearInterval(state.timer));
+            carouselStates.length = 0;
+            output.innerHTML = "";
+            appendLayoutChildren(template.content, output);
+
+            if (output.children.length === 0) {
+                output.appendChild(createPlaceholder());
             }
         }
 
         function setupDownloadLink() {
             const link = document.getElementById("downloadLink");
             const name = document.getElementById("downloadName");
+            
+            const fileName = link.getAttribute("href").split("/").pop();
 
-            link.href = downloadFile;
-            name.textContent = downloadFile.split("/").pop();
+            name.textContent = fileName;
+            link.download = fileName; 
         }
 
         updateDateTime();
         setInterval(updateDateTime, 1000);
-        renderAnnouncementImages();
+        renderAnnouncementTemplate();
         setupDownloadLink();
     </script>
 </body>

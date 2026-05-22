@@ -70,9 +70,11 @@ npx http-server .
 This template is designed to be easily customized for any department dashboard. Here is how you can modify it to suit your needs:
 
 ### 1. Where to Modify Links
+
 All sidebar navigation links are located in `index.html` within the `<ul class="menu-links">` section (around line 38). Find the `<a>` tags inside the `<li>` items to update the `href` attribute with the path to your new report or page.
 
 ### 2. Opening in New Tab vs. Content Frame
+
 - **Embed in Content Frame (Default):** To open a page inside the dashboard without reloading the entire application, set the `target` attribute to `content-frame`:
   ```html
   <a href="your_report.html" target="content-frame">Report Name</a>
@@ -83,7 +85,9 @@ All sidebar navigation links are located in `index.html` within the `<ul class="
   ```
 
 ### 3. How to Add a New Menu/Submenu
+
 To add a new main menu item with a submenu, copy and paste the following block into the `<ul class="menu-links">` in `index.html`:
+
 ```html
 <li class="nav-link sub-menu-wrap">
     <a href="#" class="submenu-toggle">
@@ -92,15 +96,18 @@ To add a new main menu item with a submenu, copy and paste the following block i
         <i class='bx bx-chevron-down arrow text'></i>
     </a>
     <ul class="sub-menu">
-        <li><a href="new_page_1.html" target="content-frame">Submenu 1</a></li>
+        <li><a href="new_page_1.html" target="content-frame">Submenu 1</a></li>git
         <li><a href="new_page_2.html" target="content-frame">Submenu 2</a></li>
     </ul>
 </li>
 ```
+
 *Tip: Change the `bx-folder` class to any other icon from [Boxicons](https://boxicons.com/).*
 
 ### 4. How to Modify the Home Page
-The default page loaded when the dashboard opens is `home.html`. 
+
+The default page loaded when the dashboard opens is `home.html`.
+
 - To edit its content, simply open `home.html` and make your changes. It will automatically be reflected in the main iframe view of the dashboard.
 - If you want to change which file is loaded by default, edit the `src` attribute of the `iframe` in `index.html` (around line 114):
   ```html
