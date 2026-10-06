@@ -1,0 +1,23 @@
+/* Offline enhancements for Excel "Save as Web Page" report tables. */
+.ett-shell { box-sizing: border-box; margin: 12px; color: #1f2937; font: 14px/1.4 Arial, sans-serif; }
+.ett-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.ett-toolbar input, .ett-toolbar button { box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 4px; background: #fff; padding: 6px 8px; font: inherit; }
+.ett-toolbar input { min-width: 220px; }
+.ett-toolbar button { cursor: pointer; }
+.ett-toolbar button:hover { background: #f1f5f9; }
+.ett-count { color: #64748b; white-space: nowrap; }
+.ett-columns { position: relative; }
+.ett-columns-menu { position: absolute; z-index: 20; top: calc(100% + 4px); left: 0; display: none; min-width: 185px; max-height: 250px; overflow: auto; padding: 8px; border: 1px solid #cbd5e1; border-radius: 5px; background: #fff; box-shadow: 0 5px 16px rgb(15 23 42 / 18%); }
+.ett-columns-menu.is-open { display: block; }
+.ett-columns-menu label { display: block; padding: 4px; white-space: nowrap; }
+.ett-table-wrap { overflow: auto; max-height: calc(100vh - 92px); border: 1px solid #cbd5e1; background: #fff; }
+table.ett-table { width: max-content; min-width: 100%; border-collapse: collapse; table-layout: fixed; }
+.ett-table th, .ett-table td { position: relative; min-width: 72px; max-width: 420px; padding: 6px 8px; border: 1px solid #dbe3ec; vertical-align: top; overflow: hidden; text-overflow: ellipsis; }
+.ett-table thead th { position: sticky; z-index: 3; top: 0; background: #eef4fb; box-shadow: inset 0 -1px #b8c6d6; }
+.ett-heading { display: flex; min-width: 0; align-items: center; gap: 4px; }
+.ett-sort { flex: 1; min-width: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+.ett-filter { width: 100%; margin-top: 5px; box-sizing: border-box; border: 1px solid #bac8d7; border-radius: 3px; padding: 3px 4px; font: 12px Arial, sans-serif; }
+.ett-resizer { position: absolute; z-index: 5; top: 0; right: -3px; width: 7px; height: 100%; cursor: col-resize; }
+.ett-table tbody tr:hover td { background: #f8fafc; }
+.ett-table td.ett-selected { background: #cfe8ff !important; outline: 1px solid #5795cc; outline-offset: -1px; }
+.ett-table .ett-hidden { display: none; }

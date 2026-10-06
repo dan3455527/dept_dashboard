@@ -34,6 +34,9 @@ WEB/
 ├── bootstrap5.css          # Local Bootstrap 5 styles
 ├── boxicon.css             # Local Boxicons styles
 ├── bundle.js               # Local JS dependencies
+├── assets/                 # Offline enhancements for published Excel tables
+├── reports/                # One published Excel Web Page per report folder
+├── Update-InteractiveReports.cmd # Applies table controls after Excel publishes HTML
 ├── README.md               # Documentation and project overview
 ├── IMG/                    # Image assets directory
 ├── Announce_img/           # Announcement images directory
@@ -113,3 +116,91 @@ The default page loaded when the dashboard opens is `home.html`.
   ```html
   <iframe name="content-frame" src="your_new_home.html" frameborder="0" class="content-iframe"></iframe>
   ```
+
+### 5. Published Excel HTML reports
+
+Publish each Excel report as a Web Page inside its own `reports/<report-name>/` folder. Then double-click `Update-InteractiveReports.cmd`. It updates the generated worksheet HTML files with local-only controls for search, filtering, sorting, column visibility, resizing, and copying selected cells. It never opens or alters the original Excel workbook.
+
+Finally, add one sidebar link per report, using a relative path to its main HTML file:
+
+```html
+<li><a href="reports/bill/bill.html" target="content-frame">Bill</a></li>
+```
+
+## Excel-to-HTML interactive report SOP
+
+Use this process whenever a new Excel report needs to appear in the dashboard. The report stays a local, read-only HTML display: filtering, sorting, and copying do **not** change the Excel workbook.
+
+### 1. Publish the workbook into its own report folder
+
+In Excel, use **Save As / Publish as Web Page** and publish each report to this layout:
+
+```text
+WEB/
+  reports/
+    bill/
+      bill.html
+      bill.fld/
+        sheet001.html
+        stylesheet.css
+    inventory/
+      inventory.html
+      inventory.fld/
+        sheet001.html
+```
+
+Keep one report per folder. The main `<report>.html` is the page the dashboard loads; the `.fld/sheet001.html` file contains the actual Excel table.
+
+### 2. Add the report to the sidebar
+
+In `index.html`, add a separate link for every report. Always use a **relative** path and keep `target="content-frame"` so it appears inside the dashboard:
+
+```html
+<li><a href="reports/bill/bill.html" target="content-frame">Bill</a></li>
+<li><a href="reports/inventory/inventory.html" target="content-frame">Inventory</a></li>
+```
+
+Do not use `C:\...`, a drive letter, or `file:///...` in these links. The relative path keeps the dashboard working when the shared drive is mounted under a different drive letter.
+
+### 3. Apply the interactive table tools on Windows
+
+After every Excel publish, double-click `Update-InteractiveReports.cmd` in the `WEB` root folder. It runs `Tools/Enhance-ExcelHtmlReports.ps1` and automatically updates every worksheet HTML file under `reports/`.
+
+The tool is safe to run repeatedly. It replaces its prior injected references instead of adding duplicates. It only changes the generated HTML files; it never opens, saves, or modifies the `.xlsx` / `.xlsm` file.
+
+### 4. Confirm the result
+
+Open `index.html` in Chrome, select the report from the sidebar, and confirm that the table includes:
+
+- Search all columns
+- Per-column filters and sortable headings
+- Columns visibility menu and drag-to-resize headings
+- Drag to select cells, then press `Ctrl+C` (or `Cmd+C` on macOS) to copy
+
+### Recovery path: the Windows shortcut cannot run
+
+If `Update-InteractiveReports.cmd` is blocked, missing, or points to the wrong folder, the report can still be enabled manually. Open the real worksheet file, normally `reports/<report-name>/<report-name>.fld/sheet001.html`, and insert these two lines immediately before `</head>`:
+
+```html
+<link rel="stylesheet" href="../../../assets/excel-table-tools.css" data-excel-table-tools>
+<script src="../../../assets/excel-table-tools.js" defer data-excel-table-tools></script>
+```
+
+The path above is correct for the standard `reports/<report-name>/<report-name>.fld/sheet001.html` layout. Save the file, reload the dashboard in Chrome, and click the sidebar item again.
+
+For an older report stored directly in the `WEB` root, such as `WEB/bill.fld/sheet001.html`, use one fewer level:
+
+```html
+<link rel="stylesheet" href="../assets/excel-table-tools.css" data-excel-table-tools>
+<script src="../assets/excel-table-tools.js" defer data-excel-table-tools></script>
+```
+
+Excel will overwrite these two lines when it publishes the report again. Re-run the Windows shortcut after each publish, or repeat the manual insertion if the shortcut remains unavailable.
+
+### Troubleshooting checklist
+
+- **The sidebar opens a blank page:** check that the `href` points to the report's main `.html` file, not to `sheet001.html`.
+- **The report loads but has no controls:** open the matching `.fld/sheet001.html` and verify the two `data-excel-table-tools` lines are present before `</head>`.
+- **Styles or controls fail to load:** check the relative `../assets/` or `../../../assets/` path against the table above; the path is relative to `sheet001.html`, not `index.html`.
+- **Excel overwrote the controls:** this is expected after publishing; run `Update-InteractiveReports.cmd` again.
+- **A table is not enhanced:** the report must contain an HTML `<table>` with at least a header row and one data row. The tool enhances the largest table in that worksheet.
